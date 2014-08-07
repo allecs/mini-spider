@@ -22,13 +22,8 @@ class ItemHandler():
         self._scheduler = scheduler
         self._threads = []
         self._init_threads(thread_count)
-        try:
-            if not os.path.exists(self._output_directory):
-                logging.warning('Output dir not existing')
-                os.makedirs(self._output_directory)
-                logging.info('Output dir created')
-        except EnvironmentError as err:
-            logging.error('Creating output dir: %s', err.message)
+        self._create_dir_lock = threading.Lock()
+        self._create_output_dir()
 
     @staticmethod
     def need_parse(item):
@@ -89,21 +84,34 @@ class ItemHandler():
     def _handle(self):
         while True:
             item = self._in_queue.get()
-            if self._is_target(item):
-                self._save_to_file(item)
-            if self.need_parse(item):
-                item.children += self.get_all_links(item)
+            if item.is_requested:
+                if self._is_target(item):
+                    self._save_to_file(item)
+                if self.need_parse(item):
+                    item.links += self.get_all_links(item)
             self._scheduler.feedback(item)
+
+    def _is_target(self, item):
+        return re.match(self._target_url, item.final_url)
 
     def _save_to_file(self, item):
         pathname = os.path.join(self._output_directory,
                                 urllib.quote(item.final_url, ''))
         try:
+            if not os.path.exists(self._output_directory):
+                self._create_output_dir()
             with open(pathname, 'w') as f:
                 f.write(item.content)
-            logging.debug('Item %s saved', item.final_url)
+            logging.info('Item %s saved', item.final_url)
         except EnvironmentError as err:
             logging.error('Failed to save %s: %s', item.final_url, err.message)
 
-    def _is_target(self, item):
-        return re.match(self._target_url, item.final_url)
+    def _create_output_dir(self):
+        with self._create_dir_lock:
+            try:
+                if not os.path.exists(self._output_directory):
+                    logging.warning('Output dir not existing')
+                    os.makedirs(self._output_directory)
+                    logging.info('Output dir created')
+            except EnvironmentError as err:
+                logging.error('Creating output dir: %s', err.message)

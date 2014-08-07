@@ -15,4 +15,4 @@ class Item(object):
         self.content = None
         self.final_url = None
         self.is_finished = False
-        self.children = []
+        self.links = []

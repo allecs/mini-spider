@@ -16,9 +16,10 @@ class Downloader(object):
     下载器
     """
 
-    def __init__(self, thread_count, crawl_timeout, item_handler=None, scheduler=None):
+    def __init__(self, thread_count=1, crawl_interval=2.0, crawl_timeout=10.0, item_handler=None):
         self._item_handler = item_handler
-        self._scheduler = scheduler
+        self._crawl_interval = crawl_interval
+        self._wait_semaphore = threading.Semaphore()
         self._crawl_timeout = crawl_timeout
         self._in_queue = Queue.Queue()
         self._threads = []
@@ -27,18 +28,12 @@ class Downloader(object):
     def set_handler(self, handler):
         self._item_handler = handler
 
-    def set_scheduler(self, scheduler):
-        self._scheduler = scheduler
-
     def add_item(self, item):
         self._in_queue.put(item)
 
     def start(self):
         if not self._item_handler:
             logging.critical('ItemHandler not found, exiting')
-            sys.exit(1)
-        if not self._scheduler:
-            logging.critical('Scheduler not found, exiting')
             sys.exit(1)
         logging.info('Starting downloader, with %s threads', len(self._threads))
         for t in self._threads:
@@ -64,6 +59,7 @@ class Downloader(object):
 
     def _do_download(self, item):
         logging.debug('Item %s start downloading', item.url)
+        self._wait_in_line()
         r = requests.get(item.url, timeout=self._crawl_timeout)
         item.final_url = r.url
         r.raise_for_status()
@@ -72,3 +68,11 @@ class Downloader(object):
         item.encoding = r.apparent_encoding
         item.content = r.content
         item.is_requested = True
+
+    def _wait_in_line(self):
+        logging.debug('Start waiting in line')
+        self._wait_semaphore.acquire()
+        t = threading.Timer(self._crawl_interval, self._wait_semaphore.release)
+        t.daemon = True
+        t.start()
+        logging.debug('Here we go')
