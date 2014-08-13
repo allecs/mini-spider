@@ -76,3 +76,4 @@ class Downloader(object):
         t.daemon = True
         t.start()
         logging.debug('Here we go')
+

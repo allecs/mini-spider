@@ -15,6 +15,7 @@ class ItemHandler():
     """
     处理已下载项目，包括解析连接，保存项目等
     """
+
     def __init__(self, output_directory, target_url, scheduler=None, thread_count=1):
         self._in_queue = Queue.Queue()
         self._output_directory = os.path.normpath(output_directory)
@@ -84,11 +85,12 @@ class ItemHandler():
     def _handle(self):
         while True:
             item = self._in_queue.get()
-            if item.is_requested:
+            if item.is_requested:  # TODO: tackle parse exceptions
                 if self._is_target(item):
                     self._save_to_file(item)
                 if self.need_parse(item):
                     item.links += self.get_all_links(item)
+                item.is_handled = True
             self._scheduler.feedback(item)
 
     def _is_target(self, item):
