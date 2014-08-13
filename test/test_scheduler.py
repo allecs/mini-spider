@@ -15,7 +15,6 @@ class MyTestCase(unittest.TestCase):
         logging.basicConfig(level=logging.DEBUG, stream=sys.stdout,
                             format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d * %(thread)d %(message)s",
                             datefmt="%m-%d %H:%M:%S")
-
         self.init_scheduler()
 
     def init_scheduler(self):
@@ -51,9 +50,15 @@ class MyTestCase(unittest.TestCase):
                 'http://w2.baidu.com/', 'http://w3.baidu.com/',
                 'http://w4.baidu.com/', 'http://w5.baidu.com/']
         self.scheduler._in_progress.add(urls[1])
-        self.scheduler._finished[urls[4]] = item.Item(urls[4], 3)
+        redundant = 4
+        self.scheduler._finished[urls[redundant]] = item.Item(urls[redundant], 3)
         for u in urls:
             self.scheduler._create_item(u, 5)
+
+        urls.remove(urls[redundant])
+        for u in urls:
+            self.assertIn(u, self.scheduler._in_progress)
+        self.assertEqual(len(self.scheduler._in_progress), len(urls))
 
     def test_handle_feedback(self):
         self.init_scheduler()
