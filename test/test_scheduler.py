@@ -10,7 +10,7 @@ import unittest
 import scheduler
 
 
-class MyTestCase(unittest.TestCase):
+class SchedulerTestCase(unittest.TestCase):
     def setUp(self):
         logging.basicConfig(level=logging.DEBUG, stream=sys.stdout,
                             format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d * %(thread)d %(message)s",
@@ -50,7 +50,7 @@ class MyTestCase(unittest.TestCase):
                 'http://w2.baidu.com/', 'http://w3.baidu.com/',
                 'http://w4.baidu.com/', 'http://w5.baidu.com/']
         self.scheduler._in_progress.add(urls[1])
-        redundant = 4
+        redundant = 2
         self.scheduler._finished[urls[redundant]] = item.Item(urls[redundant], 3)
         for u in urls:
             self.scheduler._create_item(u, 5)

@@ -36,25 +36,45 @@ class ItemHandler():
         links = []
 
         for a in soup.find_all('a'):
-            href = a.get('href')
-            if href.startswith('javascript:location.href='):
-                href = re.search('".*"$', href).group(0)[1:-1]
-            href = urlparse.urljoin(item.final_url, href)
-            links.append(href)
+            try:
+                href = a.get('href')
+                if href:
+                    if href.startswith('javascript:location.href='):
+                        href = re.search('".*"$', href).group(0)[1:-1]
+                    href = urlparse.urljoin(item.final_url, href)
+                    links.append(href)
+            except AttributeError:
+                logging.error(a)
+                continue
+
+        for img in soup.find_all('img'):
+            try:
+                src = img.get('src')
+                if src:
+                    href = urlparse.urljoin(item.final_url, src)
+                    links.append(href)
+            except AttributeError:
+                logging.error(img)
 
         for script in soup.find_all('script'):
-            text = re.search('location.href=".*"', script.text)
-            if text:
-                href = re.search('".*"', text.group(0)).group(0)[1:-1]
-                href = urlparse.urljoin(item.final_url, href)
-                links.append(href)
+            try:
+                text = re.search('location.href=".*"', script.text)
+                if text:
+                    href = re.search('".*"', text.group(0)).group(0)[1:-1]
+                    href = urlparse.urljoin(item.final_url, href)
+                    links.append(href)
+            except AttributeError:
+                logging.error(script)
 
         for meta in soup.find_all('meta'):
-            if meta.get('http-equiv') == 'refresh':
-                href = meta.get('content')
-                href = href.split('url=')[1]
-                href = urlparse.urljoin(item.final_url, href)
-                links.append(href)
+            try:
+                if meta.get('http-equiv') == 'refresh':
+                    href = meta.get('content')
+                    href = href.split('url=')[1]
+                    href = urlparse.urljoin(item.final_url, href)
+                    links.append(href)
+            except AttributeError:
+                logging.error(meta)
 
         return links
 
@@ -85,6 +105,7 @@ class ItemHandler():
     def _handle(self):
         while True:
             item = self._in_queue.get()
+            logging.debug('Handler received item: %s', item.url)
             if item.is_requested:  # TODO: tackle parse exceptions
                 if self._is_target(item):
                     self._save_to_file(item)
@@ -102,7 +123,7 @@ class ItemHandler():
         try:
             if not os.path.exists(self._output_directory):
                 self._create_output_dir()
-            with open(pathname, 'w') as f:
+            with open(pathname, 'wb') as f:
                 f.write(item.content)
             logging.info('Item %s saved', item.final_url)
         except EnvironmentError as err:

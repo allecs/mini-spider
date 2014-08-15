@@ -16,7 +16,7 @@ class Downloader(object):
     下载器
     """
 
-    def __init__(self, thread_count=1, crawl_interval=2.0, crawl_timeout=10.0, item_handler=None):
+    def __init__(self, thread_count, crawl_interval, crawl_timeout, item_handler=None):
         self._item_handler = item_handler
         self._crawl_interval = crawl_interval
         self._wait_semaphore = threading.Semaphore()
@@ -53,7 +53,7 @@ class Downloader(object):
                 logging.debug('Downloader thread %s start downloading: %s', threading.current_thread().name, item.url)
                 self._do_download(item)
             except requests.RequestException as error:
-                logging.error(error.message)
+                logging.error(str(error.message)+ ': ' + item.url)
             finally:
                 self._item_handler.add_item(item)
 

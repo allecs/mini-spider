@@ -22,33 +22,33 @@ class DownloaderTestCase(unittest.TestCase):
     def tearDown(self):
         pass
 
-    # def test_start(self):
-    #     self.dldr.start()
-    #     urls = ['http://cq02-spi-ssd2p-bak10.cq02.baidu.com:8000',
-    #             'http://cq02-spi-ssd2p-bak10.cq02.baidu.com:8000/page1.html',
-    #             'http://cq02-spi-ssd2p-bak10.cq02.baidu.com:8000/1/page1_1.html']
-    #
-    #     for i in urls:
-    #         self.dldr.add_item(item.Item(i, 3))
-    #         time.sleep(1)
-    #
-    #     while self.handler._in_queue.qsize() != len(urls):
-    #         pass
-    #
-    # def test_do_download(self):
-    #     i = item.Item("http://cq02-spi-ssd2p-bak10.cq02.baidu.com:8000", 3)
-    #     self.dldr._do_download(i)
-    #     self.assertTrue(i.is_requested)
-    #
-    #     i = item.Item("http://www.sina.com", 3)
-    #     self.dldr._do_download(i)
-    #     self.assertTrue(i.is_requested)
-    #
-    #     i = item.Item("http://cq02-spi-ssd2p-bak10.cq02.baidu.com:13246", 3)
-    #     self.assertRaises(requests.RequestException, self.dldr._do_download, i)
-    #
-    #     i = item.Item("http://cq02-spi-ssd2p-bak10.cq02.baidu-this-is-a-fake-one-xxx.com", 3)
-    #     self.assertRaises(requests.RequestException, self.dldr._do_download, i)
+    def test_start(self):
+        self.dldr.start()
+        urls = ['http://cq02-spi-ssd2p-bak10.cq02.baidu.com:8000',
+                'http://cq02-spi-ssd2p-bak10.cq02.baidu.com:8000/page1.html',
+                'http://cq02-spi-ssd2p-bak10.cq02.baidu.com:8000/1/page1_1.html']
+
+        for i in urls:
+            self.dldr.add_item(item.Item(i, 3))
+            time.sleep(1)
+
+        while self.handler._in_queue.qsize() != len(urls):
+            pass
+
+    def test_do_download(self):
+        i = item.Item("http://cq02-spi-ssd2p-bak10.cq02.baidu.com:8000", 3)
+        self.dldr._do_download(i)
+        self.assertTrue(i.is_requested)
+
+        i = item.Item("http://www.sina.com", 3)
+        self.dldr._do_download(i)
+        self.assertTrue(i.is_requested)
+
+        i = item.Item("http://cq02-spi-ssd2p-bak10.cq02.baidu.com:13246", 3)
+        self.assertRaises(requests.RequestException, self.dldr._do_download, i)
+
+        i = item.Item("http://cq02-spi-ssd2p-bak10.cq02.baidu-this-is-a-fake-one-xxx.com", 3)
+        self.assertRaises(requests.RequestException, self.dldr._do_download, i)
 
     def test_wait_in_line(self):
         for i in xrange(10):
