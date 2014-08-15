@@ -10,10 +10,12 @@ class ItemHandlerTestCase(unittest.TestCase):
 
     def setUp(self):
         logging.basicConfig(level=logging.DEBUG, stream=sys.stdout,
-                            format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d * %(thread)d %(message)s",
+                            format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d * "
+                                   "%(thread)d %(message)s",
                             datefmt="%m-%d %H:%M:%S")
         self.scheduler = self.MockScheduler()
-        self.item_handler = itemhandler.ItemHandler('./output', '.*\.(gif|png|jpg|bmp)$', self.scheduler, 5)
+        self.item_handler = itemhandler.ItemHandler('./output', '.*\.(gif|png|jpg|bmp)$',
+                                                    self.scheduler, 5)
 
         self.test_item = item.Item('http://cq02-spi-ssd2p-bak10.cq02.baidu.com:8000/', 4)
         self.test_item.is_requested = True
@@ -31,7 +33,9 @@ class ItemHandlerTestCase(unittest.TestCase):
                                 <li><a href=page1.html>page 1</a></li>
                                 <li><a href="page2.html">page 2</a></li>
                                 <li><a href='page3.html'>page 3</a></li>
-                                <li><a href='mirror/index.html'>http://cq02-spi-ssd2p-bak10.cq02.baidu.com:8000/mirror/index.html</a></li>
+                                <li><a href='mirror/index.html'>
+                                http://cq02-spi-ssd2p-bak10.cq02.baidu.com:8000/mirror/index.html
+                                </a></li>
                                 <li><a href='javascript:location.href="page4.html"'>page 4</a></li>
                                 <script>location.href="page1_1.html";</script>
                                 <meta http-equiv="refresh" content="0;url=page1_2.html">

@@ -1,3 +1,6 @@
+"""
+测试下载工具
+"""
 import Queue
 import sys
 import threading
@@ -10,7 +13,14 @@ import logging
 
 
 class DownloaderTestCase(unittest.TestCase):
+    """
+    测试下载工具
+    """
     def setUp(self):
+        """
+        初始化
+        :return:
+        """
         logging.basicConfig(level=logging.DEBUG, stream=sys.stdout,
                             format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d * "
                                    "%(thread)d %(message)s",
@@ -19,10 +29,11 @@ class DownloaderTestCase(unittest.TestCase):
         self.dldr = downloader.Downloader(thread_count=2, crawl_interval=2, crawl_timeout=10.0,
                                           item_handler=self.handler)
 
-    def tearDown(self):
-        pass
-
     def test_start(self):
+        """
+        测试运行下载工具
+        :return:
+        """
         self.dldr.start()
         urls = ['http://cq02-spi-ssd2p-bak10.cq02.baidu.com:8000',
                 'http://cq02-spi-ssd2p-bak10.cq02.baidu.com:8000/page1.html',

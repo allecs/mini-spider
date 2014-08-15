@@ -1,10 +1,7 @@
-import copy
 import logging
 import sys
-import threading
 import item
 
-__author__ = 'aolixiang'
 
 import unittest
 import scheduler
@@ -13,7 +10,8 @@ import scheduler
 class SchedulerTestCase(unittest.TestCase):
     def setUp(self):
         logging.basicConfig(level=logging.DEBUG, stream=sys.stdout,
-                            format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d * %(thread)d %(message)s",
+                            format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d *"
+                                   " %(thread)d %(message)s",
                             datefmt="%m-%d %H:%M:%S")
         self.init_scheduler()
 

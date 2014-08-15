@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+处理下载项工具，包含一个ItemHandler类
+"""
 import Queue
 import logging
 import os
@@ -11,9 +14,9 @@ import urllib
 import sys
 
 
-class ItemHandler():
+class ItemHandler(object):
     """
-    处理已下载项目，包括解析连接，保存项目等
+    处理下载项类，负责处理Downloader下载项目，包括解析连接，保存项目等，再反馈给Scheduler
     """
 
     def __init__(self, output_directory, target_url, scheduler=None, thread_count=1):
@@ -26,12 +29,20 @@ class ItemHandler():
         self._create_dir_lock = threading.Lock()
         self._create_output_dir()
 
-    @staticmethod
     def need_parse(item):
+        """
+        判断item是否需要解析，即是否是html
+        :param item: 需要判断的项目
+        :return:
+        """
         return item.headers['content-type'].find('text/html') >= 0
 
-    @staticmethod
     def get_all_links(item):
+        """
+        获取item中所有超链接
+        :param item: 需要获取的item
+        :return:
+        """
         soup = bs4.BeautifulSoup(item.content)
         links = []
 
@@ -79,9 +90,18 @@ class ItemHandler():
         return links
 
     def set_scheduler(self, scheduler):
+        """
+        设置Scheduler对象
+        :param scheduler: Scheduler对象
+        :return:
+        """
         self._scheduler = scheduler
 
     def start(self):
+        """
+        启动处理器，需在scheduler设置之后才能调用该方法
+        :return:
+        """
         if not self._scheduler:
             logging.critical('Scheduler not found, terminating program')
             sys.exit(1)
