@@ -29,19 +29,19 @@ class ItemHandler(object):
         self._create_dir_lock = threading.Lock()
         self._create_output_dir()
 
-    def need_parse(item):
+    def need_parse(self, item):
         """
         判断item是否需要解析，即是否是html
         :param item: 需要判断的项目
-        :return:
+        :return: 布尔值
         """
         return item.headers['content-type'].find('text/html') >= 0
 
-    def get_all_links(item):
+    def get_all_links(self, item):
         """
         获取item中所有超链接
         :param item: 需要获取的item
-        :return:
+        :return: 包含所有已解析链接的列表
         """
         soup = bs4.BeautifulSoup(item.content)
         links = []
@@ -110,6 +110,11 @@ class ItemHandler(object):
             t.start()
 
     def add_item(self, item):
+        """
+        添加处理项
+        :param item: 需要处理的项目
+        :return:
+        """
         self._in_queue.put(item)
 
     def _init_threads(self, thread_count):
@@ -126,7 +131,7 @@ class ItemHandler(object):
         while True:
             item = self._in_queue.get()
             logging.debug('Handler received item: %s', item.url)
-            if item.is_requested:  # TODO: tackle parse exceptions
+            if item.is_requested:
                 if self._is_target(item):
                     self._save_to_file(item)
                 if self.need_parse(item):
@@ -137,9 +142,11 @@ class ItemHandler(object):
     def _is_target(self, item):
         return re.match(self._target_url, item.final_url)
 
+    def _get_save_path(self, url):
+        return os.path.join(self._output_directory, urllib.quote(url, ''))
+
     def _save_to_file(self, item):
-        pathname = os.path.join(self._output_directory,
-                                urllib.quote(item.final_url, ''))
+        pathname = self._get_save_path(item.final_url)
         try:
             if not os.path.exists(self._output_directory):
                 self._create_output_dir()

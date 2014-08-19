@@ -11,10 +11,18 @@ import itemhandler
 
 
 def usage():
+    """
+    打印usage
+    :return:
+    """
     print >> sys.stderr, '''Usage: python mini_spider.py -c <conf file>'''
 
 
 def setup_log():
+    """
+    配置日志
+    :return:
+    """
     logging.basicConfig(level=logging.DEBUG, stream=sys.stdout,
                         format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d * "
                                "%(thread)d %(message)s",
@@ -22,6 +30,11 @@ def setup_log():
 
 
 def get_config(config_file):
+    """
+    获取配置
+    :param config_file:
+    :return: 包含所有配置项的字典
+    """
     config = ConfigParser.ConfigParser()
     config.read(config_file)
     conf_dict = {}
@@ -31,6 +44,10 @@ def get_config(config_file):
 
 
 def main():
+    """
+    主方法
+    :return:
+    """
     config_file = ''
     try:
         optlist, args = getopt.getopt(sys.argv[1:], 'c:')
@@ -77,6 +94,7 @@ def main():
     hdlr.start()
     sched.start()
 
+    exit(0)
 
 if __name__ == '__main__':
     main()

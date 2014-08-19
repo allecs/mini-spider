@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+测试调度器
+"""
 import logging
 import sys
 import item
@@ -8,7 +13,14 @@ import scheduler
 
 
 class SchedulerTestCase(unittest.TestCase):
+    """
+    测试调度器类
+    """
     def setUp(self):
+        """
+        初始设置
+        :return:
+        """
         logging.basicConfig(level=logging.DEBUG, stream=sys.stdout,
                             format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d *"
                                    " %(thread)d %(message)s",
@@ -16,11 +28,19 @@ class SchedulerTestCase(unittest.TestCase):
         self.init_scheduler()
 
     def init_scheduler(self):
+        """
+        初始化
+        :return:
+        """
         self.downloader = self.MockDownloader()
         self.scheduler = scheduler.Scheduler(2, ['http://www.baidu.com'], self.downloader)
         self.downloader.scheduler = self.scheduler
 
     def test_finish(self):
+        """
+        测试_finish方法
+        :return:
+        """
         self.init_scheduler()
         test_url = 'http://www.baidu.com/'
         self.scheduler._in_progress.add(test_url)
@@ -43,6 +63,10 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertIn(redirected_url, self.scheduler._finished)
 
     def test_create_item(self):
+        """
+        测试_create_item方法
+        :return:
+        """
         self.init_scheduler()
         urls = ['http://www.baidu.com/', 'http://w1.baidu.com/',
                 'http://w2.baidu.com/', 'http://w3.baidu.com/',
@@ -59,6 +83,10 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(len(self.scheduler._in_progress), len(urls))
 
     def test_handle_feedback(self):
+        """
+        测试_handle_feedback方法
+        :return:
+        """
         self.init_scheduler()
 
         item_handled_5 = item.Item('http://www.baidu.com/', 5)
@@ -79,6 +107,10 @@ class SchedulerTestCase(unittest.TestCase):
             self.scheduler._handle_feedback()
 
     def test_scheduler(self):
+        """
+        测试Scheduler
+        :return:
+        """
         self.init_scheduler()
         final_url = 'http://new.baidu.com'
         links = ['http://w1.baidu.com', 'http://w2.baidu.com', 'http://w3.baidu.com']
@@ -94,20 +126,36 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(2 + len(links), len(self.scheduler._finished))
 
     class MockDownloader(object):
+        """
+        模拟下载工具
+        """
         def __init__(self):
             self.scheduler = None
 
         def add_item(self, item):
+            """
+            模拟添加下载项
+            :param item: 下载项
+            :return:
+            """
             logging.debug('MockDownloader add %s', item.url)
             self.scheduler.feedback(item)
 
     class MockDownloaderAndHandler(object):
+        """
+        模拟下载工具和项目处理器环路
+        """
         def __init__(self, final_url, links):
             self._scheduler = None
             self._final_url = final_url
             self._links = links
 
         def add_item(self, item):
+            """
+            模拟添加下载项，下载、处理项目以及反馈回Scheduler
+            :param item: 项目
+            :return:
+            """
             logging.debug('MockDownloaderAndHandler add %s', item.url)
             item.is_handled = True
             item.final_url = self._final_url
