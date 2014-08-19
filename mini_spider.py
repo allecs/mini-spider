@@ -43,12 +43,22 @@ def get_config(config_file):
     return conf_dict
 
 
+def get_seeds(seed_file):
+    """
+    从文件中读取种子
+    :return: 包含所有种子的列表
+    """
+    seeds = []
+    with open(seed_file) as seed_file:
+            seeds.append(seed_file.readline())
+    return seeds
+
+
 def main():
     """
     主方法
     :return:
     """
-    config_file = ''
     try:
         optlist, args = getopt.getopt(sys.argv[1:], 'c:')
         for o, a in optlist:
@@ -74,15 +84,14 @@ def main():
         print >> sys.stderr, error
         exit(1)
 
-    seeds = []
     try:
-        with open(url_list_file) as seed_file:
-            seeds.append(seed_file.readline())
+        seeds = get_seeds(url_list_file)
     except EnvironmentError as error:
         print >> sys.stderr, error
         exit(1)
 
     setup_log()
+
     sched = scheduler.Scheduler(int(max_depth), seeds)
     dldr = downloader.Downloader(int(thread_count), float(crawl_interval), float(crawl_timeout))
     hdlr = itemhandler.ItemHandler(output_directory, target_url)
