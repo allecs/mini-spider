@@ -53,7 +53,8 @@ def get_seeds(seed_file):
     """
     seeds = []
     with open(seed_file) as seed_file:
-        seeds.append(seed_file.readline())
+        for seed in iter(seed_file):
+            seeds.append(seed.strip())
     return seeds
 
 

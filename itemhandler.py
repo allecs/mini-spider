@@ -19,7 +19,7 @@ class ItemHandler(object):
     处理下载项类，负责处理Downloader下载项目，包括解析连接，保存项目等，再反馈给Scheduler
     """
 
-    def __init__(self, output_directory, target_url, scheduler=None, thread_count=1):
+    def __init__(self, output_directory, target_url, scheduler=None, thread_count=5):
         self._in_queue = Queue.Queue()
         self._output_directory = os.path.normpath(output_directory)
         self._target_url = target_url
@@ -54,8 +54,9 @@ class ItemHandler(object):
                         href = re.search('".*"$', href).group(0)[1:-1]
                     href = urlparse.urljoin(item.final_url, href)
                     links.append(href)
-            except AttributeError:
+            except (AttributeError, IndexError) as err:
                 logging.error(a)
+                logging.error(err.message)
                 continue
 
         for img in soup.find_all('img'):
@@ -64,8 +65,10 @@ class ItemHandler(object):
                 if src:
                     href = urlparse.urljoin(item.final_url, src)
                     links.append(href)
-            except AttributeError:
+            except (AttributeError, IndexError) as err:
                 logging.error(img)
+                logging.error(err.message)
+                continue
 
         for script in soup.find_all('script'):
             try:
@@ -74,8 +77,10 @@ class ItemHandler(object):
                     href = re.search('".*"', text.group(0)).group(0)[1:-1]
                     href = urlparse.urljoin(item.final_url, href)
                     links.append(href)
-            except AttributeError:
+            except (AttributeError, IndexError) as err:
                 logging.error(script)
+                logging.error(err.message)
+                continue
 
         for meta in soup.find_all('meta'):
             try:
@@ -84,8 +89,10 @@ class ItemHandler(object):
                     href = href.split('url=')[1]
                     href = urlparse.urljoin(item.final_url, href)
                     links.append(href)
-            except AttributeError:
+            except (AttributeError, IndexError) as err:
                 logging.error(meta)
+                logging.error(err.message)
+                continue
 
         return links
 
