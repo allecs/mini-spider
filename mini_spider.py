@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+Mini Spider主程序入口
+"""
 import ConfigParser
 import getopt
 import logging
@@ -50,7 +53,7 @@ def get_seeds(seed_file):
     """
     seeds = []
     with open(seed_file) as seed_file:
-            seeds.append(seed_file.readline())
+        seeds.append(seed_file.readline())
     return seeds
 
 
